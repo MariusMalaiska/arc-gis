@@ -1,0 +1,18 @@
+@import "./helpers.scss";
+
+.App{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+.Container{
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    flex-direction: column;  
+    
+    .Header{
+        color: black;
+        text-align: center;
+    }
+  
+}}
