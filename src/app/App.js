@@ -10,31 +10,33 @@ function App() {
   useEffect(() => {
     loadModules([
       "esri/Map",
+      "esri/config",
       "esri/views/MapView",
-      "esri/Graphic",
-      "esri/layers/GraphicsLayer",
       "esri/layers/FeatureLayer",
-      "esri/Basemap",
       "esri/layers/MapImageLayer",
       "esri/widgets/Search",
     ]).then(
       ([
         ArcGISMap,
+        esriConfig,
         MapView,
-        Graphic,
-        GraphicsLayer,
         FeatureLayer,
-        Basemap,
         MapImageLayer,
         Search,
       ]) => {
         const map = new ArcGISMap({});
+        esriConfig.apiKey =
+          "AAPKa50cbd71ab6745b2ba76974ebe4d852bPB_Dz8hi2xiW89S90EDHOiL4qtaYbp1QRYLHndBziE9YwxH29D2a1kl9tFcOe1ly";
 
-        const layer = new MapImageLayer({
+        const addToView = (layer) => {
+          map.add(layer);
+        };
+
+        const imagelayer = new MapImageLayer({
           url: "https://gis.vplanas.lt/arcgis/rest/services/Baziniai_zemelapiai/ORTOFOTO_2019_LKS_FULL/MapServer",
         });
 
-        map.add(layer);
+        addToView(imagelayer);
 
         const view = new MapView({
           container: mapRef.current,
@@ -43,34 +45,53 @@ function App() {
           // zoom: 6,
         });
 
-        // const searchWidget = new Search({
-        //   view: view,
-        // });
-
-        // view.ui.add(searchWidget, {
-        //   position: "top-right",
-        // });
-
-        // map.add(searchWidget);
-
-        // const popupTrailheads = {
-        //   title: "Trailhead",
-        //   content: "<b>ZMOGUS:</b> {ZMOGUS}<br>",
-        // };
-
-        // const trailheads = new FeatureLayer({
-        //   url: "https://services1.arcgis.com/usA3lHW20rGU6glp/ArcGIS/rest/services/Viln_lent_pam_2020_gdb/FeatureServer/0",
-        //   outFields: ["ZMOGUS"],
-        //   popupTemplate: popupTrailheads,
-        // });
-
-        // map.add(trailheads);
-
-        const myLayer = new FeatureLayer({
-          url: "https://services1.arcgis.com/usA3lHW20rGU6glp/ArcGIS/rest/services/Viln_lent_pam_2020_gdb/FeatureServer/0",
+        const search = new Search({
+          view: view,
         });
 
-        map.add(myLayer);
+        view.ui.add(search, "top-right");
+
+        const layer = new FeatureLayer({
+          url: "https://services1.arcgis.com/usA3lHW20rGU6glp/ArcGIS/rest/services/Viln_lent_pam_2020_gdb/FeatureServer/0",
+          // infoTemplate: popupTemplate,
+          objectIdField: "OBJECTID",
+          fields: [
+            {
+              name: "OBJECTID",
+              type: "oid",
+            },
+            {
+              name: "url",
+              type: "string",
+            },
+          ],
+          renderer: {
+            type: "simple",
+            symbol: {
+              type: "text",
+              color: "#5491f5",
+              text: "\ue61d",
+              font: {
+                size: 20,
+                family: "CalciteWebCoreIcons",
+              },
+            },
+          },
+          popupTemplate: {
+            title: "Generic Popup",
+            content: "sdsdsd",
+          },
+        });
+
+        addToView(layer);
+
+        // create a new popupTemplate for the layer
+        // const popupTemplate = {
+        //   title: "name",
+        //   content: "jhjbmn",
+        // };
+
+        // layer.popupTemplate = popupTemplate;
 
         return () => {
           if (view) {
@@ -88,7 +109,6 @@ function App() {
           <h1>Gis Task</h1>
         </header>
         <div style={{ width: "100%", height: "80vh" }}>
-          <div ref={mapRef}></div>
           <div
             className="webmap"
             ref={mapRef}
